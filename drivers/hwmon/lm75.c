@@ -565,6 +565,7 @@ static int lm75_probe(struct i2c_client *client)
 {
 	struct device *dev = &client->dev;
 	struct device *hwmon_dev;
+	const char *hwmon_dev_name;
 	struct lm75_data *data;
 	int status, err;
 	enum lm75_type kind;
@@ -588,6 +589,11 @@ static int lm75_probe(struct i2c_client *client)
 	data->vs = devm_regulator_get(dev, "vs");
 	if (IS_ERR(data->vs))
 		return PTR_ERR(data->vs);
+
+	if (of_property_read_bool(dev->of_node, "use-dt-name"))
+		hwmon_dev_name = dev->of_node->name;
+	else
+		hwmon_dev_name = client->name;
 
 	data->regmap = devm_regmap_init_i2c(client, &lm75_regmap_config);
 	if (IS_ERR(data->regmap))
@@ -632,7 +638,7 @@ static int lm75_probe(struct i2c_client *client)
 	if (err)
 		return err;
 
-	hwmon_dev = devm_hwmon_device_register_with_info(dev, client->name,
+	hwmon_dev = devm_hwmon_device_register_with_info(dev, hwmon_dev_name,
 							 data, &lm75_chip_info,
 							 NULL);
 	if (IS_ERR(hwmon_dev))

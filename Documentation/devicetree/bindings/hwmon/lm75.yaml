@@ -47,6 +47,11 @@ properties:
   vs-supply:
     description: phandle to the regulator that provides the +VS supply
 
+  use-dt-name:
+    description:
+      Use dts node name as hwmon device name
+    $ref: /schemas/types.yaml#/definitions/flag
+
 required:
   - compatible
   - reg
