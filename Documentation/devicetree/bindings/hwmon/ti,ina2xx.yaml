@@ -36,6 +36,11 @@ properties:
       Shunt resistor value in micro-Ohm.
     $ref: /schemas/types.yaml#/definitions/uint32
 
+  use-dt-name:
+    description:
+      Use dts node name as hwmon device name
+    $ref: /schemas/types.yaml#/definitions/flag
+
   ti,shunt-gain:
     description: |
       Programmable gain divisor for the shunt voltage accuracy and range. This

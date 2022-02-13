@@ -620,6 +620,7 @@ static int ina2xx_probe(struct i2c_client *client)
 	struct device *dev = &client->dev;
 	struct ina2xx_data *data;
 	struct device *hwmon_dev;
+	const char *hwmon_dev_name;
 	u32 val;
 	int ret, group = 0;
 	enum ina2xx_ids chip;
@@ -648,6 +649,11 @@ static int ina2xx_probe(struct i2c_client *client)
 
 	ina2xx_set_shunt(data, val);
 
+	if (of_property_read_bool(dev->of_node, "use-dt-name"))
+		hwmon_dev_name = dev->of_node->name;
+	else
+		hwmon_dev_name = client->name;
+
 	ina2xx_regmap_config.max_register = data->config->registers;
 
 	data->regmap = devm_regmap_init_i2c(client, &ina2xx_regmap_config);
@@ -666,7 +672,7 @@ static int ina2xx_probe(struct i2c_client *client)
 	if (chip == ina226)
 		data->groups[group++] = &ina226_group;
 
-	hwmon_dev = devm_hwmon_device_register_with_groups(dev, client->name,
+	hwmon_dev = devm_hwmon_device_register_with_groups(dev, hwmon_dev_name,
 							   data, data->groups);
 	if (IS_ERR(hwmon_dev))
 		return PTR_ERR(hwmon_dev);
